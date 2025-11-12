@@ -7,21 +7,17 @@ const dataSource = new DataSource({
   type: 'sqlite',
   database: 'whitelabel.db',
   entities: [Client, User],
-  synchronize: true, // Create tables if they don't exist
-  logging: true,
+  synchronize: true,
+  logging: false,
 });
 
 async function runSeed() {
   try {
     await dataSource.initialize();
-    console.log('📦 Database connected');
-
     await seedDatabase(dataSource);
-
-    console.log('✅ Seed completed successfully');
     await dataSource.destroy();
   } catch (error) {
-    console.error('❌ Error running seed:', error);
+    console.error('Error running seed:', error);
     await dataSource.destroy();
     process.exit(1);
   }

@@ -15,7 +15,7 @@ export class Client {
   description: string;
 
   @Column({ nullable: true, default: '#3B82F6' })
-  primaryColor: string; // Cor primária para tema whitelabel (ex: #3B82F6 para azul, #10B981 para verde, #8B5CF6 para roxo)
+  primaryColor: string;
 
   @Column({ default: true })
   isActive: boolean;

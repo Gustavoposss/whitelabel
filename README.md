@@ -11,9 +11,10 @@ Sistema de e-commerce whitelabel desenvolvido com NestJS (API) e Flutter (Fronte
 - **JWT** - Autenticação
 - **Swagger** - Documentação da API
 
-### Frontend (Em desenvolvimento)
+### Frontend
 - **Flutter** - Framework multiplataforma
 - **Dart** - Linguagem de programação
+- **Provider** - Gerenciamento de estado
 
 ## 📋 Funcionalidades
 
@@ -26,13 +27,15 @@ Sistema de e-commerce whitelabel desenvolvido com NestJS (API) e Flutter (Fronte
 - ✅ Documentação Swagger
 - ✅ Collection Postman
 
-### Frontend (⏳ Em desenvolvimento)
-- ⏳ Login
-- ⏳ Listagem de produtos
-- ⏳ Filtros de produtos
-- ⏳ Whitelabel (tema dinâmico)
+### Frontend (✅ Completo)
+- ✅ Login
+- ✅ Listagem de produtos
+- ✅ Filtros de produtos
+- ✅ Whitelabel (tema dinâmico)
+- ✅ Detalhes do produto
+- ✅ Busca e ordenação
 
-## 🛠️ Instalação
+## 🛠️ Instalação e Execução
 
 ### Pré-requisitos
 - Node.js (v18+)
@@ -40,29 +43,83 @@ Sistema de e-commerce whitelabel desenvolvido com NestJS (API) e Flutter (Fronte
 - Flutter (v3.0+)
 - Dart (v3.0+)
 
-### API
+### 🔧 API (NestJS)
 
+#### 1. Instalar dependências (primeira vez)
 ```bash
 cd api
 npm install
-npm run seed  # Popular banco de dados
+```
+
+#### 2. Popular banco de dados (primeira vez)
+```bash
+npm run seed
+```
+
+#### 3. Iniciar API em modo desenvolvimento
+```bash
 npm run start:dev
 ```
 
-A API estará disponível em: `http://localhost:3000`
+A API estará disponível em: `http://localhost:3000`  
 Swagger: `http://localhost:3000/api/docs`
 
-### Frontend
+#### 📋 Comandos Úteis da API
+- `npm run start:dev` - Inicia em modo desenvolvimento (watch mode)
+- `npm run start` - Inicia em modo produção
+- `npm run build` - Compila o projeto
+- `npm run seed` - Popular banco de dados
 
+### 📱 Frontend (Flutter)
+
+#### 1. Instalar dependências (primeira vez)
 ```bash
-# Em desenvolvimento
+cd app
+flutter pub get
 ```
+
+#### 2. Executar aplicação
+
+**Web (Chrome):**
+```bash
+flutter run -d chrome
+```
+
+**Web (Edge):**
+```bash
+flutter run -d edge
+```
+
+**Windows:**
+```bash
+flutter run -d windows
+```
+
+**Android (com emulador/dispositivo conectado):**
+```bash
+flutter run
+```
+
+**iOS (apenas macOS):**
+```bash
+flutter run -d ios
+```
+
+#### 📋 Comandos Úteis do Flutter
+- `flutter pub get` - Instala/atualiza dependências
+- `flutter run` - Executa a aplicação
+- `flutter run -d chrome` - Executa no Chrome
+- `flutter analyze` - Analisa o código
+- `flutter clean` - Limpa o projeto
+- `flutter doctor` - Verifica o ambiente
 
 ## 📚 Documentação
 
 - **Swagger**: http://localhost:3000/api/docs
 - **Collection Postman**: `docs/postman-collection.json`
+- **Arquitetura**: `docs/ARQUITETURA.md`
 - **Status do Projeto**: `STATUS.md`
+- **Comandos**: `COMANDOS.md`
 
 ## 🧪 Testes
 
@@ -73,8 +130,8 @@ bash testar-api.sh
 
 ## 📝 Credenciais de Teste
 
-- **Cliente 1**: `user1@cliente1.com` / `password123`
-- **Cliente 2**: `user2@cliente2.com` / `password123`
+- **Cliente 1** (Verde #10B981): `user1@cliente1.com` / `password123`
+- **Cliente 2** (Laranja #F59E0B): `user2@cliente2.com` / `password123`
 - **Admin**: `admin@example.com` / `password123`
 
 ## 🎯 Critérios de Aceite
@@ -87,21 +144,23 @@ bash testar-api.sh
 - [x] DER do Banco de Dados
 
 ### Frontend
-- [ ] Feito usando Flutter
-- [ ] Funcionalidade de Login
-- [ ] Listar e filtrar os produtos
-- [ ] Consulta de produtos deve bater na API
-- [ ] Funcionalidade de Whitelabel
-- [ ] Documentação da arquitetura
+- [x] Feito usando Flutter
+- [x] Funcionalidade de Login
+- [x] Listar e filtrar os produtos
+- [x] Consulta de produtos deve bater na API
+- [x] Funcionalidade de Whitelabel
+- [x] Documentação da arquitetura
 
 ## 📦 Estrutura do Projeto
 
 ```
 Processo-Seletivo-da-IN8Devnology/
 ├── api/                 # API NestJS
-├── app/                 # App Flutter (em desenvolvimento)
+├── app/                 # App Flutter
 ├── docs/                # Documentação
-└── STATUS.md            # Status do projeto
+├── README.md            # README principal
+├── STATUS.md            # Status do projeto
+└── COMANDOS.md          # Guia de comandos
 ```
 
 ## 🔗 Links

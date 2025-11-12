@@ -24,42 +24,48 @@ export class ClientsController {
     return this.clientsService.findAll();
   }
 
+  private toPlainClient(client: Client): Client {
+    return {
+      id: client.id,
+      name: client.name,
+      url: client.url,
+      description: client.description,
+      primaryColor: client.primaryColor,
+      isActive: client.isActive,
+      createdAt: client.createdAt,
+      updatedAt: client.updatedAt,
+    } as Client;
+  }
+
   @Get('current')
   @UseGuards(JwtAuthGuard)
-  @ApiOperation({ summary: 'Get current client information (based on URL/header)' })
+  @ApiOperation({ summary: 'Get current client information' })
   @ApiResponse({ status: 200, description: 'Current client information', type: Client })
   @ApiResponse({ status: 404, description: 'Client not found' })
   @ApiBearerAuth()
   async getCurrent(@Req() req: any): Promise<Client> {
-    // Check if client is attached by middleware (as plain object to avoid circular references)
-    if (req.client && req.client.id) {
-      // Return the plain object from middleware (already without circular references)
+    if (req.user?.clientId) {
+      try {
+        const client = await this.clientsService.findOne(req.user.clientId);
+        return this.toPlainClient(client);
+      } catch (error) {
+        // Continue to next method
+      }
+    }
+
+    if (req.client?.id) {
       return req.client as Client;
     }
-    
-    // Try to get from header (Express converts headers to lowercase)
+
     const clientUrlHeader = req.headers?.['x-client-url'];
     if (clientUrlHeader) {
       const client = await this.clientsService.findByUrl(clientUrlHeader);
       if (client) {
-        // Return only necessary fields to avoid circular references
-        return {
-          id: client.id,
-          name: client.name,
-          url: client.url,
-          description: client.description,
-          primaryColor: client.primaryColor,
-          isActive: client.isActive,
-          createdAt: client.createdAt,
-          updatedAt: client.updatedAt,
-        } as Client;
+        return this.toPlainClient(client);
       }
     }
-    
-    // If still not found, throw error
-    throw new NotFoundException(
-      'Client not found for current request. Please provide X-Client-URL header or access via client URL.',
-    );
+
+    throw new NotFoundException('Client not found for current request');
   }
 
   @Get(':id')

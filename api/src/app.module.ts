@@ -2,7 +2,6 @@ import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ClientsModule } from './clients/clients.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
@@ -23,19 +22,19 @@ import { ClientIdentifierMiddleware } from './common/middleware/client-identifie
         type: 'sqlite',
         database: configService.get<string>('DB_DATABASE') || 'whitelabel.db',
         entities: [Client, User],
-        synchronize: true, // In production, use migrations
+        synchronize: true,
         logging: false,
       }),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([Client]), // For middleware
+    TypeOrmModule.forFeature([Client]),
     ClientsModule,
     UsersModule,
     AuthModule,
     ProductsModule,
   ],
   controllers: [AppController],
-  providers: [AppService, ClientIdentifierMiddleware],
+  providers: [ClientIdentifierMiddleware],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

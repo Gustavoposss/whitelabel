@@ -12,41 +12,31 @@ export class ProductsService {
   constructor(private readonly httpService: HttpService) {}
 
   private normalizeToArray(data: any): any[] {
-    // If it's already an array, return it
     if (Array.isArray(data)) {
       return data;
     }
     
-    // If it's an object, convert it to an array
     if (typeof data === 'object' && data !== null) {
       const keys = Object.keys(data);
-      
-      // Check if it's an object with numeric keys (like {0: {...}, 1: {...}})
       const numericKeys = keys.filter(key => !isNaN(Number(key)));
       
       if (numericKeys.length > 0) {
-        // Sort by numeric key and return as array, excluding non-numeric keys
         return numericKeys
           .sort((a, b) => Number(a) - Number(b))
           .map(key => data[key])
           .filter(item => item && typeof item === 'object');
       }
       
-      // Check if it has product-like properties (id, nome, name, etc.)
       if (data.id || data.nome || data.name) {
-        // It's a single product object
         return [data];
       }
       
-      // If it's an object with other properties, try to extract arrays
-      // Look for arrays in the object
       for (const key of keys) {
         if (Array.isArray(data[key])) {
           return data[key];
         }
       }
       
-      // Last resort: return empty array if we can't figure it out
       return [];
     }
     
@@ -60,7 +50,6 @@ export class ProductsService {
       );
       return this.normalizeToArray(response.data);
     } catch (error) {
-      console.error('Error fetching from Brazilian provider:', error);
       return [];
     }
   }
@@ -72,7 +61,6 @@ export class ProductsService {
       );
       return this.normalizeToArray(response.data);
     } catch (error) {
-      console.error('Error fetching from European provider:', error);
       return [];
     }
   }
@@ -89,7 +77,6 @@ export class ProductsService {
       const response = await firstValueFrom(this.httpService.get<ProviderResponse>(url));
       return response.data;
     } catch (error) {
-      console.error(`Error fetching product ${id} from ${provider} provider:`, error);
       return null;
     }
   }
@@ -98,19 +85,10 @@ export class ProductsService {
     item: any,
     provider: 'brazilian' | 'european',
   ): Product | null {
-    // Skip if item is null or undefined
-    if (!item || typeof item !== 'object') {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) {
       return null;
     }
 
-    // Skip if item is an array or has array-like structure (nested objects)
-    if (Array.isArray(item)) {
-      return null;
-    }
-
-    // Brazilian provider uses Portuguese fields (nome, descricao, preco, categoria, imagem)
-    // European provider uses English fields (name, description, price, category, image/gallery)
-    // For Brazilian provider, prioritize Portuguese fields; for European, prioritize English
     let name: string | undefined;
     let description: string | undefined;
     let preco: any;
@@ -118,14 +96,12 @@ export class ProductsService {
     let imagem: string | undefined;
 
     if (provider === 'brazilian') {
-      // Brazilian provider: prioritize Portuguese fields
       name = item.nome || item.name;
       description = item.descricao || item.description;
       preco = item.preco || item.price;
       categoria = item.categoria || item.category;
       imagem = item.imagem || item.image;
     } else {
-      // European provider: use English fields
       name = item.name || item.nome;
       description = item.description || item.descricao;
       preco = item.price || item.preco;
@@ -133,36 +109,27 @@ export class ProductsService {
       imagem = item.image || item.imagem;
     }
 
-    // Validate required fields
     if (!name || !item.id) {
       return null;
     }
 
-    // Handle price - can be string or number
     let priceValue = 0;
     if (typeof preco === 'number') {
       priceValue = preco;
     } else if (typeof preco === 'string') {
-      // Remove any non-numeric characters except dot and comma
       const cleanedPrice = preco.replace(/[^\d.,]/g, '').replace(',', '.');
       priceValue = parseFloat(cleanedPrice) || 0;
     }
 
-    // Skip if price is 0 and we couldn't parse it (invalid product)
     if (priceValue === 0 && !preco) {
       return null;
     }
 
-    // Handle image - can be 'image', 'imagem', or 'gallery' array
     let imageUrl: string | undefined = undefined;
-    if (imagem && typeof imagem === 'string') {
-      if (imagem.startsWith('http') || imagem.startsWith('https')) {
-        imageUrl = imagem;
-      }
-    } else if (item.image && typeof item.image === 'string') {
-      if (item.image.startsWith('http') || item.image.startsWith('https')) {
-        imageUrl = item.image;
-      }
+    if (imagem && typeof imagem === 'string' && (imagem.startsWith('http') || imagem.startsWith('https'))) {
+      imageUrl = imagem;
+    } else if (item.image && typeof item.image === 'string' && (item.image.startsWith('http') || item.image.startsWith('https'))) {
+      imageUrl = item.image;
     } else if (item.gallery && Array.isArray(item.gallery) && item.gallery.length > 0) {
       const firstImage = item.gallery.find((img: string) => 
         img && typeof img === 'string' && (img.startsWith('http') || img.startsWith('https'))
@@ -172,14 +139,9 @@ export class ProductsService {
       }
     }
 
-    // Handle category - may not exist in response
     const category = categoria || item.category || item.details?.material || item.material || undefined;
-
-    // Get ID - can be string or number
     const id = String(item.id);
 
-    // Build clean product object (only English fields, no duplicates from original)
-    // This ensures we don't include Portuguese fields in the response
     const product: Product = {
       id,
       name: String(name),
@@ -190,7 +152,6 @@ export class ProductsService {
       provider,
     };
 
-    // Add optional fields only if they exist (European provider fields)
     if (item.hasDiscount !== undefined) {
       product.hasDiscount = Boolean(item.hasDiscount);
     }
@@ -204,7 +165,6 @@ export class ProductsService {
       product.gallery = item.gallery;
     }
     
-    // Add Brazilian provider specific fields (translated to English)
     if (item.departamento) {
       product.departamento = String(item.departamento);
     }
@@ -212,7 +172,6 @@ export class ProductsService {
       product.material = String(item.material || item.details.material);
     }
 
-    // Return only the clean product object (no spread of original item)
     return product;
   }
 
@@ -287,7 +246,6 @@ export class ProductsService {
       return transformed;
     }
 
-    // Try both providers if provider is not specified
     const [brazilianProduct, europeanProduct] = await Promise.all([
       this.fetchProductByIdFromProvider(id, 'brazilian'),
       this.fetchProductByIdFromProvider(id, 'european'),
